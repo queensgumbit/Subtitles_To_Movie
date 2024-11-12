@@ -15,16 +15,20 @@ class MovieSubtitle:
         audio_file = 'audio_of_movie.wav'
 
         os.system(f'ffmpeg -i "{video_path}" -t 300 -vn -acodec pcm_s16le -ar 44100 -ac 2 "{audio_file}"') #300 [second]-> 5 minutes
-        os.system(f'ffmpeg -i"{video_path}" -af silenceremove=1:0:-50dB output.wav') #pre proccesing the uadio
+        os.system(f'ffmpeg -i "{video_path}" -af silenceremove=1:0:-50dB output.wav') #pre proccesing the uadio
         os.system(f'ffmpeg -i "{video_path}" -filter:a loudnorm output.wav') #pre proccesing the audio
-
         model = whisper.load_model("base")
-        result = model.transcribe(audio_file)
-
+        result = model.transcribe(
+               audio_file,
+               language="en",           
+               temperature=0.2,         # lower temperature ->> more consistent transcriptions
+               beam_size=5,             # increase beam size ->> explore more transcription options
+               task="transcribe",       
+               word_timestamps=True     # timestamps for each individual word within the transcription
+)
         # first spoken word and its timestamp
         self.first_word = result['text'].split()[0] #"text" indicated that the audio is turned into text, then "split()" - splitting the text to each word,[0]-first word
         self.first_word_time = result['segments'][0]['start'] #"segments" indicated that the audio is turned into segments of each text and its end and start time.[0]-first segment,['start']-the start time of the first text.
-
 
     def compare_times(self):
         #Compare the first word and first subtitle times.
@@ -71,8 +75,7 @@ class Srt:
         
 
 
-
-
+        
 if __name__ == "__main__":
     movie_path = r"C:\Users\alexd\Desktop\Yasmin\MovieSubtitlesProject\Dead Poets Society\Dead.Poets.Society.1989.720p.BluRay.x264.YIFY.mp4"
     subtitle_path = r" C:\Users\alexd\Desktop\Yasmin\MovieSubtitlesProject\movie_commentary.srt"
