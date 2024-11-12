@@ -15,8 +15,8 @@ class MovieSubtitle:
         audio_file = 'audio_of_movie.wav'
 
         os.system(f'ffmpeg -i "{video_path}" -t 300 -vn -acodec pcm_s16le -ar 44100 -ac 2 "{audio_file}"') #300 [second]-> 5 minutes
-        os.system(f'ffmpeg -i input.wav -af silenceremove=1:0:-50dB output.wav') #pre proccesing the uadio
-        os.system(f'ffmpeg -i input.wav -filter:a loudnorm output.wav') #pre proccesing the audio
+        os.system(f'ffmpeg -i"{video_path}" -af silenceremove=1:0:-50dB output.wav') #pre proccesing the uadio
+        os.system(f'ffmpeg -i "{video_path}" -filter:a loudnorm output.wav') #pre proccesing the audio
 
         model = whisper.load_model("base")
         result = model.transcribe(audio_file)
